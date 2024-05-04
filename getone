@@ -1,0 +1,3 @@
+#! /lusr/bin/bash
+
+lparse $* | smodels | mkatoms
