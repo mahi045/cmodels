@@ -448,7 +448,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 		cl->allocateClause(1,1);
 		cl->addNbody(0, program.copy_set1[(itrmm)->id]);
 		cl->addPbody(0, (itrmm));
-		cout << -program.copy_set1[(itrmm)->id]->id << " " << (itrmm)->id << " 0" << endl;
+		// cout << -program.copy_set1[(itrmm)->id]->id << " " << (itrmm)->id << " 0" << endl;
 
 		program.size_of_copy++;
 		program.copyclauses.push_back(cl);
@@ -483,7 +483,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 			for (Atom **a = cr->head; a != cr->hend; a++){
 				if((*a)->inLoop != -1) { 
 					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
-					cout << program.copy_set1[(*a)->id]->id << " ";
+					// cout << program.copy_set1[(*a)->id]->id << " ";
 					pindex++;
 				}
 				else { 
@@ -493,25 +493,25 @@ Cmodels::preprocessing(bool& emptyprogram)
 			}
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
 				if((*a)->inLoop != -1) { 
-					cl->addNbody(pindex, program.copy_set1[(*a)->id]);
-					cout << -program.copy_set1[(*a)->id]->id << " ";
+					cl->addNbody(nindex, program.copy_set1[(*a)->id]);
+					// cout << -program.copy_set1[(*a)->id]->id << " ";
 				}
 				else { 
 					cl->addNbody(nindex, *a);
-					cout << -(*a)->id << " ";
+					// cout << -(*a)->id << " ";
 				}
 				nindex++;
 			}
 			for (Atom **a = cr->nbody; a != cr->nend; a++) {
 				cl->addPbody(pindex, *a);
 				pindex++;
-				cout << (*a)->id << " ";
+				// cout << (*a)->id << " ";
 			}
 			program.copyclauses.push_back(cl);
 			cl->finishClause();
 			cl->print();
 			program.size_of_copy+=1;
-			cout << "0" << endl;
+			// cout << "0" << endl;
 		}
   }
 
