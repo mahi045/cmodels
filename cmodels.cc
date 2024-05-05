@@ -436,49 +436,19 @@ Cmodels::preprocessing(bool& emptyprogram)
 	return SAT;
   }
 
-  //we allocate the managers for Zchaff/Minisat/Minisat1 here
-  switch(param.sys){
-	case ZCHAFF:{
-	  zchaffMng = SAT_InitManager();	  
-	  SAT_SetNumVariables(zchaffMng, program.number_of_atoms);	
-	  break;
-	}
-	case MINISAT:{  
-  //we alocate minisat solver here
-	minisatSolver = new SimpSolver();
-	break;
-	}
-	case MINISAT1:{
-	mSolver1 = new ms1::Solver();
-	break;
-	}
- 
-  }
-
-  setupFilenames();
-
-  //returns false if all the clauses in the file are unit clauses
-  //in such case if chaff or relsat should have been called we call zchaff
-  //  cout<<"output...";
-  
-  //minisat detects at loading clauses the basic conflicts
-  //and in such case print_output return false
-  //creates file cmodels.out or loads clauses
-  //into zchaff, minisat
-  for(vector<Atom*>::iterator itrmm=program.atoms.begin(); 
-	  itrmm!=program.atoms.end();
-	  itrmm++)
-	if((*itrmm)->inLoop!=-1){
+  for(long indA=0; indA<program.atoms.size(); indA++){
+    Atom* itrmm = program.atoms[indA];
+	if((itrmm)->inLoop!=-1){
 		// creating two set of copy variables
-		program.copy_set1[(*itrmm)->id] = api->new_atom();
-		cout << "Atom " << (*itrmm)->id << " copy atom: " << program.copy_set1[(*itrmm)->id]->id << endl;
+		program.copy_set1[(itrmm)->id] = api->new_atom();
+		cout << "Atom " << (itrmm)->id << " copy atom: " << program.copy_set1[(itrmm)->id]->id << endl;
 		// program.copy_set1[(*itrmm)->id] = api->new_atom();
 		// adding the type-1 implications
 		Clause* cl = new Clause();
 		cl->allocateClause(1,1);
-		cl->addNbody(0, program.copy_set1[(*itrmm)->id]);
-		cl->addPbody(0, (*itrmm));
-		cout << -program.copy_set1[(*itrmm)->id]->id << " " << (*itrmm)->id << " 0" << endl;
+		cl->addNbody(0, program.copy_set1[(itrmm)->id]);
+		cl->addPbody(0, (itrmm));
+		cout << -program.copy_set1[(itrmm)->id]->id << " " << (itrmm)->id << " 0" << endl;
 
 		program.size_of_copy++;
 		program.copyclauses.push_back(cl);
@@ -541,6 +511,37 @@ Cmodels::preprocessing(bool& emptyprogram)
 			cout << "0" << endl;
 		}
   }
+
+  //we allocate the managers for Zchaff/Minisat/Minisat1 here
+  switch(param.sys){
+	case ZCHAFF:{
+	  zchaffMng = SAT_InitManager();	  
+	  SAT_SetNumVariables(zchaffMng, program.number_of_atoms);	
+	  break;
+	}
+	case MINISAT:{  
+  //we alocate minisat solver here
+	minisatSolver = new SimpSolver();
+	break;
+	}
+	case MINISAT1:{
+	mSolver1 = new ms1::Solver();
+	break;
+	}
+ 
+  }
+
+  setupFilenames();
+
+  //returns false if all the clauses in the file are unit clauses
+  //in such case if chaff or relsat should have been called we call zchaff
+  //  cout<<"output...";
+  
+  //minisat detects at loading clauses the basic conflicts
+  //and in such case print_output return false
+  //creates file cmodels.out or loads clauses
+  //into zchaff, minisat
+  
   if(!print_output_for_sat()){
 	releaseSolvers();
 	return UNSAT;		
