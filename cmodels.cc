@@ -1609,12 +1609,14 @@ Cmodels::createCompletion(){
 	if((*itrmm)->inLoop!=-1){
 		// creating two set of copy variables
 		program.copy_set1[(*itrmm)->id] = api->new_atom();
+		cout << "Atom " << (*itrmm)->id << " copy atom: " << program.copy_set1[(*itrmm)->id]->id << endl;
 		// program.copy_set1[(*itrmm)->id] = api->new_atom();
 		// adding the type-1 implications
 		Clause* cl = new Clause();
 		cl->allocateClause(1,1);
 		cl->addNbody(0, program.copy_set1[(*itrmm)->id]);
 		cl->addPbody(0, (*itrmm));
+		cout << -program.copy_set1[(*itrmm)->id]->id << " " << (*itrmm)->id << " 0" << endl;
 
 		program.size_of_copy++;
 		program.copyclauses.push_back(cl);
@@ -1648,6 +1650,7 @@ Cmodels::createCompletion(){
 			for (Atom **a = cr->head; a != cr->hend; a++){
 				if((*a)->inLoop != -1) { 
 					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
+					cout << program.copy_set1[(*a)->id]->id << " ";
 					pindex++;
 				}
 				else { 
@@ -1656,18 +1659,26 @@ Cmodels::createCompletion(){
 				}
 			}
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
-				if((*a)->inLoop != -1) cl->addNbody(pindex, program.copy_set1[(*a)->id]);
-				else cl->addNbody(nindex, *a);
+				if((*a)->inLoop != -1) { 
+					cl->addNbody(pindex, program.copy_set1[(*a)->id]);
+					cout << -program.copy_set1[(*a)->id]->id << " ";
+				}
+				else { 
+					cl->addNbody(nindex, *a);
+					cout << -(*a)->id << " ";
+				}
 				nindex++;
 			}
 			for (Atom **a = cr->nbody; a != cr->nend; a++) {
 				cl->addPbody(pindex, *a);
 				pindex++;
+				cout << (*a)->id << " ";
 			}
 			program.copyclauses.push_back(cl);
 			cl->finishClause();
 			program.size_of_copy+=1;
 			cl->print();
+			cout << "0" << endl;
 		}
   }
   return;
