@@ -28,6 +28,7 @@
 
 #include "atomrule.h"
 #include <vector>
+#include <unordered_map>
 #include <queue>
 using namespace std;
 
@@ -49,6 +50,8 @@ public:
 
   queue <Atom*>q; 
   vector<Atom*>atoms; 
+  unordered_map<int, Atom*>copy_set1; 
+  unordered_map<int, Atom*>copy_set2; 
 
 
   list<Rule*> rules;
@@ -58,6 +61,7 @@ public:
 
   //Vector which will have all the clauses
   vector<Clause*> clauses;
+  vector<Clause*> copyclauses;
 
   //this number will contain a number of atoms contained in grounded program passed to cmodels
   //It is needed for the correct implementation of Ctable::getNumberGroundedAtoms()
@@ -70,6 +74,7 @@ public:
   int number_of_rules;
   int number_of_complitions; 
   long number_of_clauses;
+  long size_of_copy;
   long number_of_nestedRules;
   long cmodelsAtomsFromThisId;
 

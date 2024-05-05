@@ -2255,6 +2255,7 @@ NestedRule::NestedRule ()
   markedSCC =true;
 
   bodyACl=false;
+  bodyInCopy=false;
   bodyAClVerification=0;
 
   erased=false;//used in building reduct, rule is erased whenever it is not 

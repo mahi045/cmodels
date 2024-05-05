@@ -1603,6 +1603,73 @@ Cmodels::createCompletion(){
 	  }
 	}
   }
+  for(vector<Atom*>::iterator itrmm=program.atoms.begin(); 
+	  itrmm!=program.atoms.end();
+	  itrmm++)
+	if((*itrmm)->inLoop!=-1){
+		// creating two set of copy variables
+		program.copy_set1[(*itrmm)->id] = api->new_atom();
+		// program.copy_set1[(*itrmm)->id] = api->new_atom();
+		// adding the type-1 implications
+		Clause* cl = new Clause();
+		cl->allocateClause(1,1);
+		cl->addNbody(0, program.copy_set1[(*itrmm)->id]);
+		cl->addPbody(0, (*itrmm));
+
+		program.size_of_copy++;
+		program.copyclauses.push_back(cl);
+		cl->finishClause();
+		cl->print();
+	}
+  for(long indA=0; indA<curAtomsSize; indA++){
+	Atom *curAtom=program.atoms[indA];
+	if (curAtom->inLoop == -1) continue;
+		NestedRule* cr;
+		cr = curAtom->nestedRules.front();
+		bool involved = false;
+		for (Atom **a = cr->head; a != cr->hend; a++){
+			if((*a)->inLoop != -1 && !cr->bodyInCopy) {
+				// this rule involves in copy
+				involved = true;
+			}
+		}
+		if (involved) {
+			cr->bodyInCopy = true;
+			Clause* cl = new Clause();
+			int nbody = 0, nindex = 0;
+			int pbody = 0, pindex = 0;
+			for (Atom **a = cr->head; a != cr->hend; a++){
+				if((*a)->inLoop != -1) pbody++;
+				else nbody++;
+			}
+			for (Atom **a = cr->pbody; a != cr->nnend; a++) nbody++;
+			for (Atom **a = cr->nbody; a != cr->nend; a++) pbody++;
+			cl->allocateClause(nbody, pbody);
+			for (Atom **a = cr->head; a != cr->hend; a++){
+				if((*a)->inLoop != -1) { 
+					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
+					pindex++;
+				}
+				else { 
+					cl->addNbody(nindex, *a);
+					nindex++;
+				}
+			}
+			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
+				if((*a)->inLoop != -1) cl->addNbody(pindex, program.copy_set1[(*a)->id]);
+				else cl->addNbody(nindex, *a);
+				nindex++;
+			}
+			for (Atom **a = cr->nbody; a != cr->nend; a++) {
+				cl->addPbody(pindex, *a);
+				pindex++;
+			}
+			program.copyclauses.push_back(cl);
+			cl->finishClause();
+			program.size_of_copy+=1;
+			cl->print();
+		}
+  }
   return;
 }
   

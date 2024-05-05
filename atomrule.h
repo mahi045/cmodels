@@ -293,6 +293,7 @@ class NestedRule : public FunctionalityRule
   bool markedSCC;   //true if this rule was already once explored in buildProgramSCC 
 
   bool bodyACl; //true if Body implies A clause already exists 
+  bool bodyInCopy; // true if body exists in copy operation
   int bodyAClVerification; //>0 if Body implies A clause already 
   //exists in verification file
 
