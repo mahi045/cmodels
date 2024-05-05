@@ -465,6 +465,82 @@ Cmodels::preprocessing(bool& emptyprogram)
   //and in such case print_output return false
   //creates file cmodels.out or loads clauses
   //into zchaff, minisat
+  for(vector<Atom*>::iterator itrmm=program.atoms.begin(); 
+	  itrmm!=program.atoms.end();
+	  itrmm++)
+	if((*itrmm)->inLoop!=-1){
+		// creating two set of copy variables
+		program.copy_set1[(*itrmm)->id] = api->new_atom();
+		cout << "Atom " << (*itrmm)->id << " copy atom: " << program.copy_set1[(*itrmm)->id]->id << endl;
+		// program.copy_set1[(*itrmm)->id] = api->new_atom();
+		// adding the type-1 implications
+		Clause* cl = new Clause();
+		cl->allocateClause(1,1);
+		cl->addNbody(0, program.copy_set1[(*itrmm)->id]);
+		cl->addPbody(0, (*itrmm));
+		cout << -program.copy_set1[(*itrmm)->id]->id << " " << (*itrmm)->id << " 0" << endl;
+
+		program.size_of_copy++;
+		program.copyclauses.push_back(cl);
+		cl->finishClause();
+	}
+  for(long indA=0; indA<program.atoms.size(); indA++){
+	Atom *curAtom=program.atoms[indA];
+	if (curAtom->inLoop == -1) continue;
+		NestedRule* cr;
+		cr = curAtom->nestedRules.front();
+		bool involved = false;
+		for (Atom **a = cr->head; a != cr->hend; a++){
+			if((*a)->inLoop != -1 && !cr->bodyInCopy) {
+				// this rule involves in copy
+				involved = true;
+			}
+		}
+		if (involved) {
+			cr->bodyInCopy = true;
+			Clause* cl = new Clause();
+			int nbody = 0, nindex = 0;
+			int pbody = 0, pindex = 0;
+			for (Atom **a = cr->head; a != cr->hend; a++){
+				if((*a)->inLoop != -1) pbody++;
+				else nbody++;
+			}
+			for (Atom **a = cr->pbody; a != cr->nnend; a++) nbody++;
+			for (Atom **a = cr->nbody; a != cr->nend; a++) pbody++;
+			cl->allocateClause(nbody, pbody);
+			for (Atom **a = cr->head; a != cr->hend; a++){
+				if((*a)->inLoop != -1) { 
+					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
+					cout << program.copy_set1[(*a)->id]->id << " ";
+					pindex++;
+				}
+				else { 
+					cl->addNbody(nindex, *a);
+					nindex++;
+				}
+			}
+			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
+				if((*a)->inLoop != -1) { 
+					cl->addNbody(pindex, program.copy_set1[(*a)->id]);
+					cout << -program.copy_set1[(*a)->id]->id << " ";
+				}
+				else { 
+					cl->addNbody(nindex, *a);
+					cout << -(*a)->id << " ";
+				}
+				nindex++;
+			}
+			for (Atom **a = cr->nbody; a != cr->nend; a++) {
+				cl->addPbody(pindex, *a);
+				pindex++;
+				cout << (*a)->id << " ";
+			}
+			program.copyclauses.push_back(cl);
+			cl->finishClause();
+			program.size_of_copy+=1;
+			cout << "0" << endl;
+		}
+  }
   if(!print_output_for_sat()){
 	releaseSolvers();
 	return UNSAT;		
@@ -2060,82 +2136,6 @@ Cmodels::print_DIMACS(){
       delete program.clauses[indA];
     }
     program.clauses.clear();
-  }
-  for(vector<Atom*>::iterator itrmm=program.atoms.begin(); 
-	  itrmm!=program.atoms.end();
-	  itrmm++)
-	if((*itrmm)->inLoop!=-1){
-		// creating two set of copy variables
-		program.copy_set1[(*itrmm)->id] = api->new_atom();
-		cout << "Atom " << (*itrmm)->id << " copy atom: " << program.copy_set1[(*itrmm)->id]->id << endl;
-		// program.copy_set1[(*itrmm)->id] = api->new_atom();
-		// adding the type-1 implications
-		Clause* cl = new Clause();
-		cl->allocateClause(1,1);
-		cl->addNbody(0, program.copy_set1[(*itrmm)->id]);
-		cl->addPbody(0, (*itrmm));
-		cout << -program.copy_set1[(*itrmm)->id]->id << " " << (*itrmm)->id << " 0" << endl;
-
-		program.size_of_copy++;
-		program.copyclauses.push_back(cl);
-		cl->finishClause();
-	}
-  for(long indA=0; indA<program.atoms.size(); indA++){
-	Atom *curAtom=program.atoms[indA];
-	if (curAtom->inLoop == -1) continue;
-		NestedRule* cr;
-		cr = curAtom->nestedRules.front();
-		bool involved = false;
-		for (Atom **a = cr->head; a != cr->hend; a++){
-			if((*a)->inLoop != -1 && !cr->bodyInCopy) {
-				// this rule involves in copy
-				involved = true;
-			}
-		}
-		if (involved) {
-			cr->bodyInCopy = true;
-			Clause* cl = new Clause();
-			int nbody = 0, nindex = 0;
-			int pbody = 0, pindex = 0;
-			for (Atom **a = cr->head; a != cr->hend; a++){
-				if((*a)->inLoop != -1) pbody++;
-				else nbody++;
-			}
-			for (Atom **a = cr->pbody; a != cr->nnend; a++) nbody++;
-			for (Atom **a = cr->nbody; a != cr->nend; a++) pbody++;
-			cl->allocateClause(nbody, pbody);
-			for (Atom **a = cr->head; a != cr->hend; a++){
-				if((*a)->inLoop != -1) { 
-					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
-					cout << program.copy_set1[(*a)->id]->id << " ";
-					pindex++;
-				}
-				else { 
-					cl->addNbody(nindex, *a);
-					nindex++;
-				}
-			}
-			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
-				if((*a)->inLoop != -1) { 
-					cl->addNbody(pindex, program.copy_set1[(*a)->id]);
-					cout << -program.copy_set1[(*a)->id]->id << " ";
-				}
-				else { 
-					cl->addNbody(nindex, *a);
-					cout << -(*a)->id << " ";
-				}
-				nindex++;
-			}
-			for (Atom **a = cr->nbody; a != cr->nend; a++) {
-				cl->addPbody(pindex, *a);
-				pindex++;
-				cout << (*a)->id << " ";
-			}
-			program.copyclauses.push_back(cl);
-			cl->finishClause();
-			program.size_of_copy+=1;
-			cout << "0" << endl;
-		}
   }
   
   fclose(file);
