@@ -415,7 +415,7 @@ Cmodels::preprocessing(bool& emptyprogram)
   //the program and therefore only relevant rules would be added to list
   if(!program.tight){
 	initPBodyRules();
-	clearInLoop(); //clear inLoop atoms for future computation
+	// clearInLoop(); //clear inLoop atoms for future computation
 	//as we already used this function 
   }
 	  
@@ -441,7 +441,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 	if((itrmm)->inLoop!=-1){
 		// creating two set of copy variables
 		program.copy_set1[(itrmm)->id] = api->new_atom();
-		cout << "Atom " << (itrmm)->id << " copy atom: " << program.copy_set1[(itrmm)->id]->id << endl;
+		// cout << "Atom " << (itrmm)->id << " copy atom: " << program.copy_set1[(itrmm)->id]->id << endl;
 		// program.copy_set1[(*itrmm)->id] = api->new_atom();
 		// adding the type-1 implications
 		Clause* cl = new Clause();
@@ -453,7 +453,9 @@ Cmodels::preprocessing(bool& emptyprogram)
 		program.size_of_copy++;
 		program.copyclauses.push_back(cl);
 		cl->finishClause();
+		cl->print();
 	}
+  }
   for(long indA=0; indA<program.atoms.size(); indA++){
 	Atom *curAtom=program.atoms[indA];
 	if (curAtom->inLoop == -1) continue;
@@ -507,6 +509,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 			}
 			program.copyclauses.push_back(cl);
 			cl->finishClause();
+			cl->print();
 			program.size_of_copy+=1;
 			cout << "0" << endl;
 		}
@@ -2118,9 +2121,12 @@ Cmodels::print_DIMACS(){
       //}
       break;
     default:
-      fprintf(file, "p cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
+      fprintf(file, "p cnf %d %d\n",program.number_of_atoms, program.number_of_clauses + program.size_of_copy); 
       for(long indA=0; indA<program.clauses.size(); indA++){
 	program.clauses[indA]->printcnf(file);
+	    }
+		for(long indA=0; indA<program.copyclauses.size(); indA++){
+	program.copyclauses[indA]->printcnf(file);
 	    }
     }
   }
@@ -2137,6 +2143,10 @@ Cmodels::print_DIMACS(){
       delete program.clauses[indA];
     }
     program.clauses.clear();
+	for(long indA=0; indA<program.copyclauses.size(); indA++){		
+      delete program.copyclauses[indA];
+    }
+    program.copyclauses.clear();
   }
   
   fclose(file);
