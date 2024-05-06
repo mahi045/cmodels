@@ -3264,8 +3264,8 @@ Cmodels::setupFilenames(){
   /* initialize random seed: */
   srand (time(NULL));
 
-  sprintf(param.completionFileName,"%s%s%d%s",param.dirName,"model", rand(),".out");
-  sprintf(param.nonsmFileName,"%s%s%d%s",param.dirName,"non_sm", rand(),".out");
+  sprintf(param.completionFileName,"%s%s%s","model_",param.dirName,".out");
+  sprintf(param.nonsmFileName,"%s%s%s","non_sm_",param.dirName,".out");
   sprintf(param.solverOutputFileName,"%s%s%d%s",param.dirName,"solver-solution", rand(),".out" "%s%s",param.dirName);
 	  
   FILE* fconfig = NULL;

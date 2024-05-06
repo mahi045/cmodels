@@ -107,8 +107,7 @@ Ctable::setSingleExecutionArgument(char *arg, char *option){
 	    usage();
 	    exit(1);
 	  }
-	  strcpy(cmodels.param.completionFileName, &option[0]);
-	  strcpy(cmodels.param.nonsmFileName, &option[0]);
+	  strcpy(cmodels.param.dirName, &option[0]);
 	  ret=1;
 	}
 	else if (strcmp (&arg[1], "dimacs") == 0)
