@@ -466,12 +466,18 @@ Cmodels::preprocessing(bool& emptyprogram)
 		// cl2->print();
 	}
   }
+  bool involved = false;
   for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
 	Atom *curAtom=program.atoms[indA];
 	if (curAtom->inLoop == -1) continue;
+		for (list<NestedRule*>::iterator itrNRule = 
+				 curAtom->nestedRules.begin();
+			   itrNRule !=  curAtom->nestedRules.end(); 
+			   ++itrNRule){
 		NestedRule* cr;
-		cr = curAtom->nestedRules.front();
-		bool involved = false;
+		cr= (*itrNRule);
+		// cr = curAtom->nestedRules.front();
+		involved = false;
 		for (Atom **a = cr->head; a != cr->hend; a++){
 			if((*a)->inLoop != -1 && !cr->bodyInCopy) {
 				// this rule involves in copy
@@ -534,6 +540,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 			program.size_of_copy+=1;
 			// cout << "0" << endl;
 		}
+  	}
   }
   Clause* cl = new Clause();
   int i = 0;
