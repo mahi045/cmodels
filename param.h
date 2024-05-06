@@ -19,7 +19,8 @@ class Param{
   char file[512];
   char dirName[256];
   char cmodelsname[256];
-  char dimacsFileName[512];
+  char completionFileName[512];
+  char nonsmFileName[512];
   char solverOutputFileName[512];
   int many; 
   bool sort;
@@ -72,7 +73,8 @@ class Param{
 	strcpy(file,"\0");
 	strcpy(dirName,"\0");
 	strcpy(cmodelsname,"\0");
-	strcpy(dimacsFileName,"\0");
+	strcpy(completionFileName,"\0");
+  strcpy(nonsmFileName,"\0");
 	strcpy(solverOutputFileName,"\0");
 	eloop=false;
 	wf   =true;

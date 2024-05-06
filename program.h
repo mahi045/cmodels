@@ -52,6 +52,7 @@ public:
   vector<Atom*>atoms; 
   unordered_map<int, Atom*>copy_set1; 
   unordered_map<int, Atom*>copy_set2; 
+  unordered_map<int, Atom*>extra; 
 
 
   list<Rule*> rules;
@@ -71,6 +72,7 @@ public:
   long original_number_of_atoms;
   
   long number_of_atoms;
+  long number_of_atoms_in_completion;
   int number_of_rules;
   int number_of_complitions; 
   long number_of_clauses;

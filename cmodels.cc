@@ -435,28 +435,38 @@ Cmodels::preprocessing(bool& emptyprogram)
 	emptyprogram=true;
 	return SAT;
   }
-
-  for(long indA=0; indA<program.atoms.size(); indA++){
+  program.number_of_atoms_in_completion = program.atoms.size();
+  for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
     Atom* itrmm = program.atoms[indA];
 	if((itrmm)->inLoop!=-1){
 		// creating two set of copy variables
 		program.copy_set1[(itrmm)->id] = api->new_atom();
 		// cout << "Atom " << (itrmm)->id << " copy atom: " << program.copy_set1[(itrmm)->id]->id << endl;
-		// program.copy_set1[(*itrmm)->id] = api->new_atom();
+		program.copy_set2[(itrmm)->id] = api->new_atom();
+		program.extra[(itrmm)->id] = api->new_atom();
 		// adding the type-1 implications
 		Clause* cl = new Clause();
 		cl->allocateClause(1,1);
 		cl->addNbody(0, program.copy_set1[(itrmm)->id]);
 		cl->addPbody(0, (itrmm));
+		Clause* cl2 = new Clause();
+		cl2->allocateClause(1,1);
+		cl2->addNbody(0, program.copy_set2[(itrmm)->id]);
+		cl2->addPbody(0, (itrmm));
 		// cout << -program.copy_set1[(itrmm)->id]->id << " " << (itrmm)->id << " 0" << endl;
 
 		program.size_of_copy++;
 		program.copyclauses.push_back(cl);
 		cl->finishClause();
-		cl->print();
+		// cl->print();
+
+		program.size_of_copy++;
+		program.copyclauses.push_back(cl2);
+		cl2->finishClause();
+		// cl2->print();
 	}
   }
-  for(long indA=0; indA<program.atoms.size(); indA++){
+  for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
 	Atom *curAtom=program.atoms[indA];
 	if (curAtom->inLoop == -1) continue;
 		NestedRule* cr;
@@ -471,6 +481,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 		if (involved) {
 			cr->bodyInCopy = true;
 			Clause* cl = new Clause();
+			Clause* cl2 = new Clause();
 			int nbody = 0, nindex = 0;
 			int pbody = 0, pindex = 0;
 			for (Atom **a = cr->head; a != cr->hend; a++){
@@ -480,30 +491,36 @@ Cmodels::preprocessing(bool& emptyprogram)
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) nbody++;
 			for (Atom **a = cr->nbody; a != cr->nend; a++) pbody++;
 			cl->allocateClause(nbody, pbody);
+			cl2->allocateClause(nbody, pbody);
 			for (Atom **a = cr->head; a != cr->hend; a++){
 				if((*a)->inLoop != -1) { 
 					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
+					cl2->addPbody(pindex, program.copy_set2[(*a)->id]);
 					// cout << program.copy_set1[(*a)->id]->id << " ";
 					pindex++;
 				}
 				else { 
 					cl->addNbody(nindex, *a);
+					cl2->addNbody(nindex, *a);
 					nindex++;
 				}
 			}
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
 				if((*a)->inLoop != -1) { 
 					cl->addNbody(nindex, program.copy_set1[(*a)->id]);
+					cl2->addNbody(nindex, program.copy_set2[(*a)->id]);
 					// cout << -program.copy_set1[(*a)->id]->id << " ";
 				}
 				else { 
 					cl->addNbody(nindex, *a);
+					cl2->addNbody(nindex, *a);
 					// cout << -(*a)->id << " ";
 				}
 				nindex++;
 			}
 			for (Atom **a = cr->nbody; a != cr->nend; a++) {
 				cl->addPbody(pindex, *a);
+				cl2->addPbody(pindex, *a);
 				pindex++;
 				// cout << (*a)->id << " ";
 			}
@@ -511,9 +528,60 @@ Cmodels::preprocessing(bool& emptyprogram)
 			cl->finishClause();
 			cl->print();
 			program.size_of_copy+=1;
+
+			program.copyclauses.push_back(cl2);
+			cl2->finishClause();
+			program.size_of_copy+=1;
 			// cout << "0" << endl;
 		}
   }
+  Clause* cl = new Clause();
+  int i = 0;
+  cl->allocateClause(0,program.extra.size());
+  for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
+    Atom* itrmm = program.atoms[indA];
+	if((itrmm)->inLoop!=-1){
+		// creating two set of copy variables
+		Clause* cl1 = new Clause();
+		cl1->allocateClause(1, 1);
+		cl1->addNbody(0, program.copy_set1[(itrmm)->id]);
+		cl1->addPbody(0, program.copy_set2[(itrmm)->id]);
+		program.copyclauses.push_back(cl1);
+		cl1->finishClause();
+		program.size_of_copy+=1;
+
+		Clause* cl2 = new Clause();
+		cl2->allocateClause(1, 2);
+		cl2->addNbody(0, program.copy_set2[(itrmm)->id]);
+		cl2->addPbody(0, program.copy_set1[(itrmm)->id]);
+		cl2->addPbody(1, program.extra[(itrmm)->id]);
+		program.copyclauses.push_back(cl2);
+		cl2->finishClause();
+		program.size_of_copy+=1;
+
+		Clause* cl3 = new Clause();
+		cl3->allocateClause(1, 1);
+		cl3->addNbody(0, program.extra[(itrmm)->id]);
+		cl3->addPbody(0, program.copy_set2[(itrmm)->id]);
+		program.copyclauses.push_back(cl3);
+		cl3->finishClause();
+		program.size_of_copy+=1;
+
+		Clause* cl4 = new Clause();
+		cl4->allocateClause(2, 0);
+		cl4->addNbody(0, program.extra[(itrmm)->id]);
+		cl4->addNbody(1, program.copy_set1[(itrmm)->id]);
+		program.copyclauses.push_back(cl4);
+		cl4->finishClause();
+		program.size_of_copy+=1;
+
+		cl->addPbody(i, program.extra[(itrmm)->id]);
+		i++;
+	}
+  }
+  program.copyclauses.push_back(cl);
+  cl->finishClause();
+  program.size_of_copy+=1;
 
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
   switch(param.sys){
@@ -639,7 +707,7 @@ Cmodels::cmodels()
 	}
   }
   if(param.sys==DIMACS_PRODUCE||param.sys==CASP_DIMACS_PRODUCE){
-    cerr<<param.dimacsFileName<< " file is produced"<<endl;
+    cerr<<param.completionFileName<< " file is produced"<<endl;
     return;
   }
   
@@ -719,7 +787,7 @@ Cmodels::eraseFalseAtomsFromClauses(){
 inline void
 Cmodels::clean(){
   if(!param.keep&&param.sys!=DIMACS_PRODUCE&&param.sys!=CASP_DIMACS_PRODUCE){
-	unlink(param.dimacsFileName);
+	unlink(param.completionFileName);
 	unlink(param.solverOutputFileName);
   }
 }
@@ -2105,15 +2173,16 @@ Cmodels::print_output_for_sat(){
 void 
 Cmodels::print_DIMACS(){
   //creates cnf standard file for all sat solvers
-  unlink(param.dimacsFileName);
-  FILE* file = fopen (param.dimacsFileName, "w");
+  unlink(param.completionFileName);
+  FILE* file_c = fopen (param.completionFileName, "w");
+  FILE* file_n = fopen (param.nonsmFileName, "w");
   
-  if(file){
+  if(file_c){
     switch(param.sys){
     case  CASP_DIMACS_PRODUCE: 
-      fprintf(file, "smt cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
+      fprintf(file_c, "smt cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
       for(long indA=0; indA<program.clauses.size(); indA++){
-	program.clauses[indA]->printsmtcnf(file);
+	program.clauses[indA]->printsmtcnf(file_c);
       }
       cout<<"---------"<<endl;
       //  for(long indA=0; indA<program.atoms.size(); indA++){
@@ -2121,17 +2190,30 @@ Cmodels::print_DIMACS(){
       //}
       break;
     default:
-      fprintf(file, "p cnf %d %d\n",program.number_of_atoms, program.number_of_clauses + program.size_of_copy); 
+      fprintf(file_c, "p cnf %d %d\n",program.number_of_atoms_in_completion, program.number_of_clauses); 
       for(long indA=0; indA<program.clauses.size(); indA++){
-	program.clauses[indA]->printcnf(file);
+	program.clauses[indA]->printcnf(file_c);
+	    }
+		// now writing down the input file for non answer sets. 
+		std::string proj_str = "c ind ";
+		// Loop from 1 to 5
+		for (int i = 1; i <= program.number_of_atoms_in_completion; ++i) {
+			// each of variable is part of independent support
+			proj_str += std::to_string(i) + " ";
+		}
+		proj_str += "0";
+	  fprintf(file_n, "p cnf %d %d\n",program.number_of_atoms, program.number_of_clauses + program.size_of_copy); 
+      fprintf(file_n, proj_str.c_str());
+	  for(long indA=0; indA<program.clauses.size(); indA++){
+	program.clauses[indA]->printcnf(file_n);
 	    }
 		for(long indA=0; indA<program.copyclauses.size(); indA++){
-	program.copyclauses[indA]->printcnf(file);
+	program.copyclauses[indA]->printcnf(file_n);
 	    }
     }
   }
   else {
-    cerr<<"Cmodels: Error while opening file "<<param.dimacsFileName;
+    cerr<<"Cmodels: Error while opening file "<<param.completionFileName;
     exit(20);
   }
   //clean memory from clauses that will no longer be of use
@@ -2149,7 +2231,8 @@ Cmodels::print_DIMACS(){
     program.copyclauses.clear();
   }
   
-  fclose(file);
+  fclose(file_c);
+  fclose(file_n);
   
 }
 
@@ -2159,8 +2242,8 @@ Cmodels::print_output_for_BCircuit(){
 
   char gateName[256];
 
-  unlink(param.dimacsFileName);
-  FILE* file = fopen (param.dimacsFileName, "w"); 
+  unlink(param.completionFileName);
+  FILE* file = fopen (param.completionFileName, "w"); 
 
   if(file){
 	fprintf(file, "BC1.0\n");
@@ -2708,7 +2791,7 @@ Cmodels::call_simo()
   if (!program.basic && param.many!=1)
     erase=false;
 
-  loadFormula(param.dimacsFileName,erase,param.hf,ScopeOfNegAsFailure,param.heur);
+  loadFormula(param.completionFileName,erase,param.hf,ScopeOfNegAsFailure,param.heur);
   Result interpretation;
   while(true){
 	interpretation= SingleSolve();
@@ -3181,7 +3264,8 @@ Cmodels::setupFilenames(){
   /* initialize random seed: */
   srand (time(NULL));
 
-  sprintf(param.dimacsFileName,"%s%s%d%s",param.dirName,"dimacs-completion", rand(),".out");
+  sprintf(param.completionFileName,"%s%s%d%s",param.dirName,"model", rand(),".out");
+  sprintf(param.nonsmFileName,"%s%s%d%s",param.dirName,"non_sm", rand(),".out");
   sprintf(param.solverOutputFileName,"%s%s%d%s",param.dirName,"solver-solution", rand(),".out" "%s%s",param.dirName);
 	  
   FILE* fconfig = NULL;
@@ -3297,11 +3381,11 @@ Cmodels::setupFilenames(){
   if(param.sys == RELSAT){
 	char s[1024];
 	if(!program.tight)
-	  sprintf(s,"%s -#%d %s > %s ",relsat_loc,1   ,param.dimacsFileName,param.solverOutputFileName);
+	  sprintf(s,"%s -#%d %s > %s ",relsat_loc,1   ,param.completionFileName,param.solverOutputFileName);
 	else if(param.many!=0)
-	  sprintf(s,"%s -#%d %s > %s ",relsat_loc,param.many,param.dimacsFileName,param.solverOutputFileName);
+	  sprintf(s,"%s -#%d %s > %s ",relsat_loc,param.many,param.completionFileName,param.solverOutputFileName);
 	else 
-	  sprintf(s,"%s -#a %s > %s ",relsat_loc,param.dimacsFileName,param.solverOutputFileName);
+	  sprintf(s,"%s -#a %s > %s ",relsat_loc,param.completionFileName,param.solverOutputFileName);
 	strcpy(command,s);
 
 
@@ -3309,7 +3393,7 @@ Cmodels::setupFilenames(){
   //command line for ASSAT_ZCHAFF
   if(param.sys == ASSAT_ZCHAFF){
 	char s[1024];
-	sprintf(s,"%s %s > %s ",zchaff_loc,param.dimacsFileName,param.solverOutputFileName);
+	sprintf(s,"%s %s > %s ",zchaff_loc,param.completionFileName,param.solverOutputFileName);
 	strcpy(command,s);
 
   }
@@ -3317,7 +3401,7 @@ Cmodels::setupFilenames(){
   //command line for BCircuit
   if(param.sys == BCIRCUIT){
 	char s[1024];
-	sprintf(s,"%s %s > %s",bcircuit_loc, param.dimacsFileName, param.solverOutputFileName);
+	sprintf(s,"%s %s > %s",bcircuit_loc, param.completionFileName, param.solverOutputFileName);
 	strcpy(command,s);
   }
   
