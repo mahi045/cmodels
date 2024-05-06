@@ -2180,7 +2180,7 @@ Cmodels::print_DIMACS(){
   if(file_c){
     switch(param.sys){
     case  CASP_DIMACS_PRODUCE: 
-      fprintf(file_c, "smt cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
+      fprintf(file_c, "smt cnf %d %d\n",program.number_of_atoms_in_completion, program.number_of_clauses); 
       for(long indA=0; indA<program.clauses.size(); indA++){
 	program.clauses[indA]->printsmtcnf(file_c);
       }
@@ -2201,7 +2201,7 @@ Cmodels::print_DIMACS(){
 			// each of variable is part of independent support
 			proj_str += std::to_string(i) + " ";
 		}
-		proj_str += "0";
+		proj_str += "0\n";
 	  fprintf(file_n, "p cnf %d %d\n",program.number_of_atoms, program.number_of_clauses + program.size_of_copy); 
       fprintf(file_n, proj_str.c_str());
 	  for(long indA=0; indA<program.clauses.size(); indA++){
