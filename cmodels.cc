@@ -583,10 +583,11 @@ Cmodels::preprocessing(bool& emptyprogram)
 		i++;
 	}
   }
-  program.copyclauses.push_back(cl);
-  cl->finishClause();
-  program.size_of_copy+=1;
-
+  if (program.extra.size() > 0) {
+	program.copyclauses.push_back(cl);
+	cl->finishClause();
+	program.size_of_copy+=1;
+  }
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
   switch(param.sys){
 	case ZCHAFF:{

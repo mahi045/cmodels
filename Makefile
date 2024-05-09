@@ -9,7 +9,7 @@ CPPFLAGS =
 LDFLAGS = 
 LIBS = 
 CXXFLAGS = -g -O2 -static
-CFLAGS = -g -O2
+CFLAGS = -g -O2 -static
 
 #CC = CC
 #CC = g++ 
