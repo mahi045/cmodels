@@ -484,7 +484,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 			  }
 			  for (Atom **a = cr->pbody; a != cr->nnend; a++)
 			  {
-				  cl->addPbody(nindex, *a);
+				  cl->addNbody(nindex, *a);
 				  nindex++;
 			  }
 			  for (Atom **a = cr->nbody; a != cr->nend; a++)
