@@ -58,6 +58,7 @@ public:
 
   //Vector which will have all the clauses
   vector<Clause*> clauses;
+  vector<Clause*> singleImplication;
 
   //this number will contain a number of atoms contained in grounded program passed to cmodels
   //It is needed for the correct implementation of Ctable::getNumberGroundedAtoms()
@@ -67,6 +68,7 @@ public:
   long original_number_of_atoms;
   
   long number_of_atoms;
+  long single_implications;
   int number_of_rules;
   int number_of_complitions; 
   long number_of_clauses;

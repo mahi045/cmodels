@@ -20,6 +20,7 @@ class Param{
   char dirName[256];
   char cmodelsname[256];
   char dimacsFileName[512];
+  char residualFileName[512];
   char solverOutputFileName[512];
   int many; 
   bool sort;
@@ -73,6 +74,7 @@ class Param{
 	strcpy(dirName,"\0");
 	strcpy(cmodelsname,"\0");
 	strcpy(dimacsFileName,"\0");
+  strcpy(residualFileName,"\0");
 	strcpy(solverOutputFileName,"\0");
 	eloop=false;
 	wf   =true;

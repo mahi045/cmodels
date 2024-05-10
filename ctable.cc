@@ -101,6 +101,15 @@ Ctable::setSingleExecutionArgument(char *arg, char *option){
 	  strcpy(cmodels.param.file, &option[0]);
 	  ret=1;
 	}
+	else if(strcmp (&arg[1], "output") == 0){
+	  // the output file of clark completion	
+	  if(option==NULL){
+	    usage();
+	    exit(1);
+	  }
+	  strcpy(cmodels.param.dirName, &option[0]);
+	  ret=1;
+	}
 	else if (strcmp (&arg[1], "dimacs") == 0)
 	  cmodels.param.sys =  DIMACS_PRODUCE;
 	else if (strcmp (&arg[1], "cdimacs") == 0)

@@ -435,6 +435,70 @@ Cmodels::preprocessing(bool& emptyprogram)
 	emptyprogram=true;
 	return SAT;
   }
+  for (long indA = 0; indA < program.number_of_atoms; indA++)
+  {
+	  Atom *curAtom = program.atoms[indA];
+	  // in case, no equivalence for an atom, then add negation of the variable
+	  if (curAtom->Bneg)
+	  {
+		  Clause *cl = new Clause();
+		  cl->allocateClause(1, 0);
+		  cl->addBody(0, curAtom);
+		  program.single_implications++;
+		  cl->finishClause();
+		  program.singleImplication.push_back(cl);
+	  }
+	  if (curAtom->computeTrue || curAtom->computeTrue0)
+	  {
+		  Clause *cl = new Clause();
+		  cl->allocateClause(0, 1);
+		  cl->addBody(0, curAtom);
+		  program.single_implications++;
+		  cl->finishClause();
+		  program.singleImplication.push_back(cl);
+	  }
+	  for (list<NestedRule *>::iterator itrNRule =
+			   curAtom->nestedRules.begin();
+		   itrNRule != curAtom->nestedRules.end();
+		   ++itrNRule)
+	  {
+		  NestedRule *cr;
+		  cr = (*itrNRule);
+		  if (!cr->bodyImpliesHead)
+		  {
+			  cr->bodyImpliesHead = true;
+			  Clause *cl = new Clause();
+			  int nbody = 0, nindex = 0;
+			  int pbody = 0, pindex = 0;
+			  for (Atom **a = cr->head; a != cr->hend; a++)
+				  pbody++;
+			  for (Atom **a = cr->pbody; a != cr->nnend; a++)
+				  nbody++;
+			  for (Atom **a = cr->nbody; a != cr->nend; a++)
+				  pbody++;
+			  cl->allocateClause(nbody, pbody);
+			  for (Atom **a = cr->head; a != cr->hend; a++)
+			  {
+				  cl->addPbody(pindex, *a);
+				  pindex++;
+			  }
+			  for (Atom **a = cr->pbody; a != cr->nnend; a++)
+			  {
+				  cl->addPbody(nindex, *a);
+				  nindex++;
+			  }
+			  for (Atom **a = cr->nbody; a != cr->nend; a++)
+			  {
+				  cl->addPbody(pindex, *a);
+				  pindex++;
+				  // cout << (*a)->id << " ";
+			  }
+			  program.singleImplication.push_back(cl);
+			  cl->finishClause();
+			  program.single_implications += 1;
+		  }
+	  }
+  }
 
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
   switch(param.sys){
@@ -2025,14 +2089,15 @@ void
 Cmodels::print_DIMACS(){
   //creates cnf standard file for all sat solvers
   unlink(param.dimacsFileName);
-  FILE* file = fopen (param.dimacsFileName, "w");
+  FILE* file_c = fopen (param.dimacsFileName, "w");
+  FILE* file_r = fopen (param.residualFileName, "w");
   
-  if(file){
+  if(file_c){
     switch(param.sys){
     case  CASP_DIMACS_PRODUCE: 
-      fprintf(file, "smt cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
+      fprintf(file_c, "smt cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
       for(long indA=0; indA<program.clauses.size(); indA++){
-	program.clauses[indA]->printsmtcnf(file);
+	program.clauses[indA]->printsmtcnf(file_c);
       }
       cout<<"---------"<<endl;
       //  for(long indA=0; indA<program.atoms.size(); indA++){
@@ -2040,11 +2105,18 @@ Cmodels::print_DIMACS(){
       //}
       break;
     default:
-      fprintf(file, "p cnf %d %d\n",program.number_of_atoms, program.number_of_clauses); 
-      for(long indA=0; indA<program.clauses.size(); indA++){
-	program.clauses[indA]->printcnf(file);
-	    }
-    }
+		fprintf(file_c, "p cnf %d %d\n", program.number_of_atoms, program.number_of_clauses);
+		for (long indA = 0; indA < program.clauses.size(); indA++)
+		{
+			program.clauses[indA]->printcnf(file_c);
+		}
+
+		fprintf(file_r, "p cnf %d %d\n", program.atoms.size(), program.single_implications);
+		for (long indA = 0; indA < program.singleImplication.size(); indA++)
+		{
+			program.singleImplication[indA]->printcnf(file_r);
+		}
+	}
   }
   else {
     cerr<<"Cmodels: Error while opening file "<<param.dimacsFileName;
@@ -2061,7 +2133,8 @@ Cmodels::print_DIMACS(){
     program.clauses.clear();
   }
   
-  fclose(file);
+  fclose(file_c);
+  fclose(file_c);
   
 }
 
@@ -3093,8 +3166,8 @@ Cmodels::setupFilenames(){
   /* initialize random seed: */
   srand (time(NULL));
 
-  sprintf(param.dimacsFileName,"%s%s%d%s",param.dirName,"dimacs-completion", rand(),".out");
-  sprintf(param.solverOutputFileName,"%s%s%d%s",param.dirName,"solver-solution", rand(),".out" "%s%s",param.dirName);
+  sprintf(param.dimacsFileName,"%s%s%s","model_",param.dirName,".out");
+  sprintf(param.residualFileName,"%s%s%s","residual_",param.dirName,".out");
 	  
   FILE* fconfig = NULL;
   fconfig = fopen(param.config,"r");
