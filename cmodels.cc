@@ -448,7 +448,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 		  cl->finishClause();
 		  program.singleImplication.push_back(cl);
 	  }
-	  if (curAtom->computeTrue || curAtom->computeTrue0)
+	  else if (curAtom->computeTrue || curAtom->computeTrue0)
 	  {
 		  Clause *cl = new Clause();
 		  cl->allocateClause(0, 1);
@@ -457,45 +457,48 @@ Cmodels::preprocessing(bool& emptyprogram)
 		  cl->finishClause();
 		  program.singleImplication.push_back(cl);
 	  }
-	  for (list<NestedRule *>::iterator itrNRule =
-			   curAtom->nestedRules.begin();
-		   itrNRule != curAtom->nestedRules.end();
-		   ++itrNRule)
+	  else
 	  {
-		  NestedRule *cr;
-		  cr = (*itrNRule);
-		  if (!cr->bodyImpliesHead)
+		  for (list<NestedRule *>::iterator itrNRule =
+				   curAtom->nestedRules.begin();
+			   itrNRule != curAtom->nestedRules.end();
+			   ++itrNRule)
 		  {
-			  cr->bodyImpliesHead = true;
-			  Clause *cl = new Clause();
-			  int nbody = 0, nindex = 0;
-			  int pbody = 0, pindex = 0;
-			  for (Atom **a = cr->head; a != cr->hend; a++)
-				  pbody++;
-			  for (Atom **a = cr->pbody; a != cr->nnend; a++)
-				  nbody++;
-			  for (Atom **a = cr->nbody; a != cr->nend; a++)
-				  pbody++;
-			  cl->allocateClause(nbody, pbody);
-			  for (Atom **a = cr->head; a != cr->hend; a++)
+			  NestedRule *cr;
+			  cr = (*itrNRule);
+			  if (!cr->bodyImpliesHead)
 			  {
-				  cl->addPbody(pindex, *a);
-				  pindex++;
+				  cr->bodyImpliesHead = true;
+				  Clause *cl = new Clause();
+				  int nbody = 0, nindex = 0;
+				  int pbody = 0, pindex = 0;
+				  for (Atom **a = cr->head; a != cr->hend; a++)
+					  pbody++;
+				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
+					  nbody++;
+				  for (Atom **a = cr->nbody; a != cr->nend; a++)
+					  pbody++;
+				  cl->allocateClause(nbody, pbody);
+				  for (Atom **a = cr->head; a != cr->hend; a++)
+				  {
+					  cl->addPbody(pindex, *a);
+					  pindex++;
+				  }
+				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
+				  {
+					  cl->addNbody(nindex, *a);
+					  nindex++;
+				  }
+				  for (Atom **a = cr->nbody; a != cr->nend; a++)
+				  {
+					  cl->addPbody(pindex, *a);
+					  pindex++;
+					  // cout << (*a)->id << " ";
+				  }
+				  program.singleImplication.push_back(cl);
+				  cl->finishClause();
+				  program.single_implications += 1;
 			  }
-			  for (Atom **a = cr->pbody; a != cr->nnend; a++)
-			  {
-				  cl->addNbody(nindex, *a);
-				  nindex++;
-			  }
-			  for (Atom **a = cr->nbody; a != cr->nend; a++)
-			  {
-				  cl->addPbody(pindex, *a);
-				  pindex++;
-				  // cout << (*a)->id << " ";
-			  }
-			  program.singleImplication.push_back(cl);
-			  cl->finishClause();
-			  program.single_implications += 1;
 		  }
 	  }
   }
@@ -2134,7 +2137,7 @@ Cmodels::print_DIMACS(){
   }
   
   fclose(file_c);
-  fclose(file_c);
+  fclose(file_r);
   
 }
 
