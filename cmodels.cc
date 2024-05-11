@@ -446,6 +446,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 		  cl->addBody(0, curAtom);
 		  program.single_implications++;
 		  cl->finishClause();
+		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) curAtom->id);
 		  program.singleImplication.push_back(cl);
 	  }
 	  else if (curAtom->computeTrue || curAtom->computeTrue0)
@@ -455,6 +456,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 		  cl->addBody(0, curAtom);
 		  program.single_implications++;
 		  cl->finishClause();
+		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) curAtom->id);
 		  program.singleImplication.push_back(cl);
 	  }
 	  else
@@ -483,16 +485,19 @@ Cmodels::preprocessing(bool& emptyprogram)
 				  {
 					  cl->addPbody(pindex, *a);
 					  pindex++;
+					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
 				  }
 				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
 				  {
 					  cl->addNbody(nindex, *a);
 					  nindex++;
+					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
 				  }
 				  for (Atom **a = cr->nbody; a != cr->nend; a++)
 				  {
 					  cl->addPbody(pindex, *a);
 					  pindex++;
+					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
 					  // cout << (*a)->id << " ";
 				  }
 				  program.singleImplication.push_back(cl);
@@ -2114,7 +2119,7 @@ Cmodels::print_DIMACS(){
 			program.clauses[indA]->printcnf(file_c);
 		}
 
-		fprintf(file_r, "p cnf %d %d\n", program.atoms.size(), program.single_implications);
+		fprintf(file_r, "p cnf %d %d\n", program.original_number_of_atoms, program.single_implications);
 		for (long indA = 0; indA < program.singleImplication.size(); indA++)
 		{
 			program.singleImplication[indA]->printcnf(file_r);
