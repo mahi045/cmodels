@@ -435,6 +435,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 	emptyprogram=true;
 	return SAT;
   }
+  program.original_number_of_atoms = program.atoms[0]->id;
   for (long indA = 0; indA < program.number_of_atoms; indA++)
   {
 	  Atom *curAtom = program.atoms[indA];
