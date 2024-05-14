@@ -1780,6 +1780,8 @@ Cmodels::createFalseHeadClauses(Atom* acl){
 	cl->initClauseFromApi(api);
 	program.number_of_clauses++;
 	program.clauses.push_back(cl);
+	program.single_implications++;
+	program.singleImplication.push_back(cl);
 	cl->finishClause();
 	resetApi();
 	delete cr;
