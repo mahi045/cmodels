@@ -1840,6 +1840,34 @@ Cmodels::createNestedRuleBodyAClause(NestedRule *rb){
 	program.singleImplication.push_back(cl);
 	cl->finishClause();
 	
+	Clause *cl2 = new Clause();
+	int nbody = 0, nindex = 0;
+	int pbody = 0, pindex = 0;
+	for (Atom **a = rb->head; a != rb->hend; a++)
+		pbody++;
+	for (Atom **a = rb->pbody; a != rb->nnend; a++)
+		nbody++;
+	for (Atom **a = rb->nbody; a != rb->nend; a++)
+		pbody++;
+	cl2->allocateClause(nbody, pbody);
+	for (Atom **a = rb->head; a != rb->hend; a++)
+	{
+		cl2->addPbody(pindex, *a);
+		pindex++;
+	}
+	for (Atom **a = rb->pbody; a != rb->nnend; a++)
+	{
+		cl2->addNbody(nindex, *a);
+		nindex++;
+	}
+	for (Atom **a = rb->nbody; a != rb->nend; a++)
+	{
+		cl2->addPbody(pindex, *a);
+		pindex++;
+	}
+	program.singleImplication.push_back(cl2);
+	cl2->finishClause();
+	program.single_implications += 1;
 	resetApi();
 	
   }	
@@ -2023,7 +2051,9 @@ Cmodels::add_clause_from_compute (Atom *a, bool pos)
   cl->addBody(0,a);  
   program.number_of_clauses++;
   cl->finishClause();
-  program.clauses.push_back(cl);      
+  program.clauses.push_back(cl);    
+  program.single_implications+=1;
+  program.singleImplication.push_back(cl);
 
 }
 
