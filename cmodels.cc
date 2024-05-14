@@ -435,79 +435,92 @@ Cmodels::preprocessing(bool& emptyprogram)
 	emptyprogram=true;
 	return SAT;
   }
-  program.original_number_of_atoms = program.atoms[0]->id;
-  for (long indA = 0; indA < program.number_of_atoms; indA++)
+  program.original_number_of_atoms = 0;
+  for (long indA = 0; indA < program.singleImplication.size(); indA++)
   {
-	  Atom *curAtom = program.atoms[indA];
-	  // in case, no equivalence for an atom, then add negation of the variable
-	  if (curAtom->Bneg)
+	  Atom **a;
+	  for (a = program.singleImplication[indA]->nbody; a != program.singleImplication[indA]->nend; a++)
 	  {
-		  Clause *cl = new Clause();
-		  cl->allocateClause(1, 0);
-		  cl->addBody(0, curAtom);
-		  program.single_implications++;
-		  cl->finishClause();
-		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) curAtom->id);
-		  program.singleImplication.push_back(cl);
+		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long)(*a)->id);
 	  }
-	  else if (curAtom->computeTrue || curAtom->computeTrue0)
+
+	  for (a = program.singleImplication[indA]->pbody; a != program.singleImplication[indA]->pend; a++)
 	  {
-		  Clause *cl = new Clause();
-		  cl->allocateClause(0, 1);
-		  cl->addBody(0, curAtom);
-		  program.single_implications++;
-		  cl->finishClause();
-		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) curAtom->id);
-		  program.singleImplication.push_back(cl);
-	  }
-	  else
-	  {
-		  for (list<NestedRule *>::iterator itrNRule =
-				   curAtom->nestedRules.begin();
-			   itrNRule != curAtom->nestedRules.end();
-			   ++itrNRule)
-		  {
-			  NestedRule *cr;
-			  cr = (*itrNRule);
-			  if (!cr->bodyImpliesHead)
-			  {
-				  cr->bodyImpliesHead = true;
-				  Clause *cl = new Clause();
-				  int nbody = 0, nindex = 0;
-				  int pbody = 0, pindex = 0;
-				  for (Atom **a = cr->head; a != cr->hend; a++)
-					  pbody++;
-				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
-					  nbody++;
-				  for (Atom **a = cr->nbody; a != cr->nend; a++)
-					  pbody++;
-				  cl->allocateClause(nbody, pbody);
-				  for (Atom **a = cr->head; a != cr->hend; a++)
-				  {
-					  cl->addPbody(pindex, *a);
-					  pindex++;
-					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
-				  }
-				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
-				  {
-					  cl->addNbody(nindex, *a);
-					  nindex++;
-					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
-				  }
-				  for (Atom **a = cr->nbody; a != cr->nend; a++)
-				  {
-					  cl->addPbody(pindex, *a);
-					  pindex++;
-					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
-					  // cout << (*a)->id << " ";
-				  }
-				  program.singleImplication.push_back(cl);
-				  cl->finishClause();
-				  program.single_implications += 1;
-			  }
-		  }
+		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long)(*a)->id);
 	  }
   }
+//   for (long indA = 0; indA < program.number_of_atoms; indA++)
+//   {
+// 	  Atom *curAtom = program.atoms[indA];
+// 	  // in case, no equivalence for an atom, then add negation of the variable
+// 	  if (curAtom->Bneg)
+// 	  {
+// 		  Clause *cl = new Clause();
+// 		  cl->allocateClause(1, 0);
+// 		  cl->addBody(0, curAtom);
+// 		  program.single_implications++;
+// 		  cl->finishClause();
+// 		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) curAtom->id);
+// 		  program.singleImplication.push_back(cl);
+// 	  }
+// 	  else if (curAtom->computeTrue || curAtom->computeTrue0)
+// 	  {
+// 		  Clause *cl = new Clause();
+// 		  cl->allocateClause(0, 1);
+// 		  cl->addBody(0, curAtom);
+// 		  program.single_implications++;
+// 		  cl->finishClause();
+// 		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) curAtom->id);
+// 		  program.singleImplication.push_back(cl);
+// 	  }
+// 	  else
+// 	  {
+// 		  for (list<NestedRule *>::iterator itrNRule =
+// 				   curAtom->nestedRules.begin();
+// 			   itrNRule != curAtom->nestedRules.end();
+// 			   ++itrNRule)
+// 		  {
+// 			  NestedRule *cr;
+// 			  cr = (*itrNRule);
+// 			  if (!cr->bodyImpliesHead)
+// 			  {
+// 				  cr->bodyImpliesHead = true;
+// 				  Clause *cl = new Clause();
+// 				  int nbody = 0, nindex = 0;
+// 				  int pbody = 0, pindex = 0;
+// 				  for (Atom **a = cr->head; a != cr->hend; a++)
+// 					  pbody++;
+// 				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
+// 					  nbody++;
+// 				  for (Atom **a = cr->nbody; a != cr->nend; a++)
+// 					  pbody++;
+// 				  cl->allocateClause(nbody, pbody);
+// 				  for (Atom **a = cr->head; a != cr->hend; a++)
+// 				  {
+// 					  cl->addPbody(pindex, *a);
+// 					  pindex++;
+// 					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
+// 				  }
+// 				  for (Atom **a = cr->pbody; a != cr->nnend; a++)
+// 				  {
+// 					  cl->addNbody(nindex, *a);
+// 					  nindex++;
+// 					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
+// 				  }
+// 				  for (Atom **a = cr->nbody; a != cr->nend; a++)
+// 				  {
+// 					  cl->addPbody(pindex, *a);
+// 					  pindex++;
+// 					  program.original_number_of_atoms = max(program.original_number_of_atoms, (long) (*a)->id);
+// 					  // cout << (*a)->id << " ";
+// 				  }
+// 				  program.singleImplication.push_back(cl);
+// 				  cl->finishClause();
+// 				  program.single_implications += 1;
+// 			  }
+// 		  }
+// 	  }
+//   }
 
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
   switch(param.sys){
@@ -1823,6 +1836,8 @@ Cmodels::createNestedRuleBodyAClause(NestedRule *rb){
 	cl->initClauseFromApi(api);
 	program.number_of_clauses++;
 	program.clauses.push_back(cl);
+	program.single_implications++;
+	program.singleImplication.push_back(cl);
 	cl->finishClause();
 	
 	resetApi();
