@@ -2141,6 +2141,7 @@ Cmodels::print_DIMACS(){
 		for (long indA = 0; indA < program.singleImplication.size(); indA++)
 		{
 			program.singleImplication[indA]->printcnf(file_r);
+			program.singleImplication[indA]->print();
 		}
 	}
   }
