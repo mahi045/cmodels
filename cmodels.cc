@@ -1836,8 +1836,8 @@ Cmodels::createNestedRuleBodyAClause(NestedRule *rb){
 	cl->initClauseFromApi(api);
 	program.number_of_clauses++;
 	program.clauses.push_back(cl);
-	program.single_implications++;
-	program.singleImplication.push_back(cl);
+	// program.single_implications++;
+	// program.singleImplication.push_back(cl);
 	cl->finishClause();
 	
 	Clause *cl2 = new Clause();
@@ -2051,10 +2051,11 @@ Cmodels::add_clause_from_compute (Atom *a, bool pos)
   cl->addBody(0,a);  
   program.number_of_clauses++;
   cl->finishClause();
+  if (pos == false) {
+	program.single_implications+=1;
+  	program.singleImplication.push_back(cl);
+  }
   program.clauses.push_back(cl);    
-  program.single_implications+=1;
-  program.singleImplication.push_back(cl);
-
 }
 
 inline void
