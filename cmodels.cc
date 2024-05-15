@@ -2174,6 +2174,11 @@ Cmodels::print_DIMACS(){
 		}
 
 		fprintf(file_r, "p cnf %d %d\n", program.original_number_of_atoms, program.single_implications);
+		for (long indA = 0; indA < program.number_of_atoms; indA++)
+		{
+			Atom *curAtom = program.atoms[indA];
+			fprintf(file_r, "%d => %s\n", curAtom->id, curAtom->atom_name());
+		}
 		for (long indA = 0; indA < program.singleImplication.size(); indA++)
 		{
 			program.singleImplication[indA]->printcnf(file_r);
@@ -3230,7 +3235,7 @@ Cmodels::setupFilenames(){
   srand (time(NULL));
 
   sprintf(param.dimacsFileName,"%s%s%s","model_",param.dirName,".out");
-  sprintf(param.residualFileName,"%s%s%s","residual_",param.dirName,".out");
+  sprintf(param.residualFileName,"%s%s%s","map_",param.dirName,".out");
 	  
   FILE* fconfig = NULL;
   fconfig = fopen(param.config,"r");
