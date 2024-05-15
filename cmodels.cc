@@ -2173,17 +2173,17 @@ Cmodels::print_DIMACS(){
 			program.clauses[indA]->printcnf(file_c);
 		}
 
-		fprintf(file_r, "p cnf %d %d\n", program.original_number_of_atoms, program.single_implications);
+		// fprintf(file_r, "p cnf %d %d\n", program.original_number_of_atoms, program.single_implications);
 		for (long indA = 0; indA < program.number_of_atoms; indA++)
 		{
 			Atom *curAtom = program.atoms[indA];
 			fprintf(file_r, "%d => %s\n", curAtom->id, curAtom->atom_name());
 		}
-		for (long indA = 0; indA < program.singleImplication.size(); indA++)
-		{
-			program.singleImplication[indA]->printcnf(file_r);
-			program.singleImplication[indA]->print();
-		}
+		// for (long indA = 0; indA < program.singleImplication.size(); indA++)
+		// {
+		// 	program.singleImplication[indA]->printcnf(file_r);
+		// 	program.singleImplication[indA]->print();
+		// }
 	}
   }
   else {
