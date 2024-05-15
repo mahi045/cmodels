@@ -449,6 +449,11 @@ Cmodels::preprocessing(bool& emptyprogram)
 		  program.original_number_of_atoms = max(program.original_number_of_atoms, (long)(*a)->id);
 	  }
   }
+  for (long indA = 0; indA < program.number_of_atoms; indA++)
+  {
+	  Atom *curAtom = program.atoms[indA];
+	  cout << curAtom->atom_name () << " => " << curAtom->id << endl;
+  }
 //   for (long indA = 0; indA < program.number_of_atoms; indA++)
 //   {
 // 	  Atom *curAtom = program.atoms[indA];
