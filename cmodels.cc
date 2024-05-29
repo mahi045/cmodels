@@ -2168,17 +2168,28 @@ Cmodels::print_DIMACS(){
       break;
     default:
 		fprintf(file_c, "p cnf %d %d\n", program.number_of_atoms, program.number_of_clauses);
+		std::string proj_str = "c ind ";
+		for (long indA = 0; indA < program.number_of_atoms; indA++) {
+			// each of variable is part of independent support
+			Atom *curAtom = program.atoms[indA];
+			if (curAtom->atom_name()[0] == 'd' and curAtom->atom_name()[1] == '(') {
+				proj_str += std::to_string(curAtom->id) + " ";
+			}
+		}
+		proj_str += "0\n";
+	   	fprintf(file_c, proj_str.c_str());
 		for (long indA = 0; indA < program.clauses.size(); indA++)
 		{
 			program.clauses[indA]->printcnf(file_c);
 		}
 
 		// fprintf(file_r, "p cnf %d %d\n", program.original_number_of_atoms, program.single_implications);
-		for (long indA = 0; indA < program.number_of_atoms; indA++)
-		{
-			Atom *curAtom = program.atoms[indA];
-			fprintf(file_r, "%d => %s\n", curAtom->id, curAtom->atom_name());
-		}
+		// no need to print 
+		// for (long indA = 0; indA < program.number_of_atoms; indA++)
+		// {
+		// 	Atom *curAtom = program.atoms[indA];
+		// 	fprintf(file_r, "%d => %s\n", curAtom->id, curAtom->atom_name());
+		// }
 		// for (long indA = 0; indA < program.singleImplication.size(); indA++)
 		// {
 		// 	program.singleImplication[indA]->printcnf(file_r);
