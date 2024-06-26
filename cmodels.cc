@@ -1531,18 +1531,18 @@ Cmodels::createCompletion(){
 		Completion *comp = new Completion();
 		comp->eq=IMPL; 
 		NestedRule* cr;
-		if(curAtom->original_id == 103 || curAtom->original_id == 141 || curAtom->original_id == 143) 
-		{
+		// if(curAtom->original_id == 103 || curAtom->original_id == 141 || curAtom->original_id == 143) 
+		// {
 			cout << "Head: " << curAtom->original_id << " ";
-		}
+		// }
 		if(curAtom->nestedRules.size()==1){//only one rule then completion 
 	                           //is build from this disjunctive rule
 		  
 			cr = curAtom->nestedRules.front();
-			if(curAtom->original_id == 103 || curAtom->original_id == 141 || curAtom->original_id == 143) 
-			{
+			// if(curAtom->original_id == 103 || curAtom->original_id == 141 || curAtom->original_id == 143) 
+			// {
 				cr->print();
-			}
+			// }
 		   
 			createNestedRuleBodyAClause(cr);
 			if(!curAtom->choiceruleSpecified){
@@ -1573,10 +1573,10 @@ Cmodels::createCompletion(){
 			   itrNRule !=  curAtom->nestedRules.end(); 
 			   ++itrNRule){
 			cr= (*itrNRule);
-			if(curAtom->original_id == 103 || curAtom->original_id == 141 || curAtom->original_id == 143) 
-			{
+			// if(curAtom->original_id == 103 || curAtom->original_id == 141 || curAtom->original_id == 143) 
+			// {
 				cr->print();
-			}
+			// }
 			markNestedRule(cr);			
 			createNestedRuleBodyAClause(cr);
 			//creates an auxilary atom that corresponds to body && head(minus cur atom)
