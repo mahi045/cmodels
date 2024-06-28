@@ -8,8 +8,8 @@ RANLIB = ranlib
 CPPFLAGS = 
 LDFLAGS = 
 LIBS = 
-CXXFLAGS = -g -O2
-CFLAGS = -g -O2
+CXXFLAGS = -g -O2 -fpermissive
+CFLAGS = -g -O2 -fpermissive
 
 #CC = CC
 #CC = g++ 
