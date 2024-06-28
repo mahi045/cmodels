@@ -2059,7 +2059,7 @@ Cmodels::createSingleAtomClauses(){
 	if(atom->Bpos){
 	  api->set_compute(atom, true,true);
 	}
-	if(atom->Bneg ){
+	if(atom->Bneg || atom->computeFalse){
 	  add_clause_from_compute(atom, false);
 	}
 	if(atom->computeTrue||atom->computeTrue0){
