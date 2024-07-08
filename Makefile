@@ -62,7 +62,7 @@ LIB_OBJS = $(LIB_SRCS:.cc=.o)
 
 
 cmodels:   $(SOLVER_OBJS) libsat.a
-	  $(CXX) $(LINKFLAGS) $(CFLAGS) $(MFLAGS) $(SOLVER_OBJS) libsat.a -o cmodels 
+	  $(CXX) $(LINKFLAGS) $(CFLAGS) $(MFLAGS) $(SOLVER_OBJS) libsat.a -o cmodels_copy 
 
 zverify_bf: zverify_bf.cc	
 	  $(CXX) $(LINKFLAGS) $(CFLAGS) $(MFLAGS) zverify_bf.cc -o zverify_bf
