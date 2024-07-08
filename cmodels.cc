@@ -442,17 +442,17 @@ Cmodels::preprocessing(bool& emptyprogram)
 		// creating two set of copy variables
 		program.copy_set1[(itrmm)->id] = api->new_atom();
 		// cout << "Atom " << (itrmm)->id << " copy atom: " << program.copy_set1[(itrmm)->id]->id << endl;
-		program.copy_set2[(itrmm)->id] = api->new_atom();
-		program.extra[(itrmm)->id] = api->new_atom();
+		// program.copy_set2[(itrmm)->id] = api->new_atom(); 
+		// program.extra[(itrmm)->id] = api->new_atom();
 		// adding the type-1 implications
 		Clause* cl = new Clause();
 		cl->allocateClause(1,1);
 		cl->addNbody(0, program.copy_set1[(itrmm)->id]);
 		cl->addPbody(0, (itrmm));
-		Clause* cl2 = new Clause();
-		cl2->allocateClause(1,1);
-		cl2->addNbody(0, program.copy_set2[(itrmm)->id]);
-		cl2->addPbody(0, (itrmm));
+		// Clause* cl2 = new Clause();
+		// cl2->allocateClause(1,1);
+		// cl2->addNbody(0, program.copy_set2[(itrmm)->id]);
+		// cl2->addPbody(0, (itrmm));
 		// cout << -program.copy_set1[(itrmm)->id]->id << " " << (itrmm)->id << " 0" << endl;
 
 		program.size_of_copy++;
@@ -460,9 +460,9 @@ Cmodels::preprocessing(bool& emptyprogram)
 		cl->finishClause();
 		// cl->print();
 
-		program.size_of_copy++;
-		program.copyclauses.push_back(cl2);
-		cl2->finishClause();
+		// program.size_of_copy++;
+		// program.copyclauses.push_back(cl2);
+		// cl2->finishClause();
 		// cl2->print();
 	}
   }
@@ -487,43 +487,43 @@ Cmodels::preprocessing(bool& emptyprogram)
 		if (involved) {
 			cr->bodyInCopy = true;
 			Clause* cl = new Clause();
-			Clause* cl2 = new Clause();
+			// Clause* cl2 = new Clause();
 			int nbody = 0, nindex = 0;
 			int pbody = 0, pindex = 0;
 			for (Atom **a = cr->head; a != cr->hend; a++) pbody++;
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) nbody++;
 			for (Atom **a = cr->nbody; a != cr->nend; a++) pbody++;
 			cl->allocateClause(nbody, pbody);
-			cl2->allocateClause(nbody, pbody);
+			// cl2->allocateClause(nbody, pbody);
 			for (Atom **a = cr->head; a != cr->hend; a++){
 				if((*a)->inLoop != -1) { 
 					cl->addPbody(pindex, program.copy_set1[(*a)->id]);
-					cl2->addPbody(pindex, program.copy_set2[(*a)->id]);
+					// cl2->addPbody(pindex, program.copy_set2[(*a)->id]);
 					// cout << program.copy_set1[(*a)->id]->id << " ";
 					// pindex++;
 				}
 				else { 
 					cl->addPbody(pindex, *a);
-					cl2->addPbody(pindex, *a);
+					// cl2->addPbody(pindex, *a);
 				}
 				pindex++;
 			}
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) {
 				if((*a)->inLoop != -1) { 
 					cl->addNbody(nindex, program.copy_set1[(*a)->id]);
-					cl2->addNbody(nindex, program.copy_set2[(*a)->id]);
+					// cl2->addNbody(nindex, program.copy_set2[(*a)->id]);
 					// cout << -program.copy_set1[(*a)->id]->id << " ";
 				}
 				else { 
 					cl->addNbody(nindex, *a);
-					cl2->addNbody(nindex, *a);
+					// cl2->addNbody(nindex, *a);
 					// cout << -(*a)->id << " ";
 				}
 				nindex++;
 			}
 			for (Atom **a = cr->nbody; a != cr->nend; a++) {
 				cl->addPbody(pindex, *a);
-				cl2->addPbody(pindex, *a);
+				// cl2->addPbody(pindex, *a);
 				pindex++;
 				// cout << (*a)->id << " ";
 			}
@@ -532,62 +532,63 @@ Cmodels::preprocessing(bool& emptyprogram)
 			cl->print();
 			program.size_of_copy+=1;
 
-			program.copyclauses.push_back(cl2);
-			cl2->finishClause();
-			program.size_of_copy+=1;
+			// program.copyclauses.push_back(cl2);
+			// cl2->finishClause();
+			// program.size_of_copy+=1;
 			// cout << "0" << endl;
 		}
   	}
   }
-  Clause* cl = new Clause();
-  int i = 0;
-  cl->allocateClause(0,program.extra.size());
-  for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
-    Atom* itrmm = program.atoms[indA];
-	if((itrmm)->inLoop!=-1){
-		// creating two set of copy variables
-		Clause* cl1 = new Clause();
-		cl1->allocateClause(1, 1);
-		cl1->addNbody(0, program.copy_set1[(itrmm)->id]);
-		cl1->addPbody(0, program.copy_set2[(itrmm)->id]);
-		program.copyclauses.push_back(cl1);
-		cl1->finishClause();
-		program.size_of_copy+=1;
+  // it is not needed further
+//   Clause* cl = new Clause();
+//   int i = 0;
+//   cl->allocateClause(0,program.extra.size());
+//   for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
+//     Atom* itrmm = program.atoms[indA];
+// 	if((itrmm)->inLoop!=-1){
+// 		// creating two set of copy variables
+// 		Clause* cl1 = new Clause();
+// 		cl1->allocateClause(1, 1);
+// 		cl1->addNbody(0, program.copy_set1[(itrmm)->id]);
+// 		cl1->addPbody(0, program.copy_set2[(itrmm)->id]);
+// 		program.copyclauses.push_back(cl1);
+// 		cl1->finishClause();
+// 		program.size_of_copy+=1;
 
-		Clause* cl2 = new Clause();
-		cl2->allocateClause(1, 2);
-		cl2->addNbody(0, program.copy_set2[(itrmm)->id]);
-		cl2->addPbody(0, program.copy_set1[(itrmm)->id]);
-		cl2->addPbody(1, program.extra[(itrmm)->id]);
-		program.copyclauses.push_back(cl2);
-		cl2->finishClause();
-		program.size_of_copy+=1;
+// 		Clause* cl2 = new Clause();
+// 		cl2->allocateClause(1, 2);
+// 		cl2->addNbody(0, program.copy_set2[(itrmm)->id]);
+// 		cl2->addPbody(0, program.copy_set1[(itrmm)->id]);
+// 		cl2->addPbody(1, program.extra[(itrmm)->id]);
+// 		program.copyclauses.push_back(cl2);
+// 		cl2->finishClause();
+// 		program.size_of_copy+=1;
 
-		Clause* cl3 = new Clause();
-		cl3->allocateClause(1, 1);
-		cl3->addNbody(0, program.extra[(itrmm)->id]);
-		cl3->addPbody(0, program.copy_set2[(itrmm)->id]);
-		program.copyclauses.push_back(cl3);
-		cl3->finishClause();
-		program.size_of_copy+=1;
+// 		Clause* cl3 = new Clause();
+// 		cl3->allocateClause(1, 1);
+// 		cl3->addNbody(0, program.extra[(itrmm)->id]);
+// 		cl3->addPbody(0, program.copy_set2[(itrmm)->id]);
+// 		program.copyclauses.push_back(cl3);
+// 		cl3->finishClause();
+// 		program.size_of_copy+=1;
 
-		Clause* cl4 = new Clause();
-		cl4->allocateClause(2, 0);
-		cl4->addNbody(0, program.extra[(itrmm)->id]);
-		cl4->addNbody(1, program.copy_set1[(itrmm)->id]);
-		program.copyclauses.push_back(cl4);
-		cl4->finishClause();
-		program.size_of_copy+=1;
+// 		Clause* cl4 = new Clause();
+// 		cl4->allocateClause(2, 0);
+// 		cl4->addNbody(0, program.extra[(itrmm)->id]);
+// 		cl4->addNbody(1, program.copy_set1[(itrmm)->id]);
+// 		program.copyclauses.push_back(cl4);
+// 		cl4->finishClause();
+// 		program.size_of_copy+=1;
 
-		cl->addPbody(i, program.extra[(itrmm)->id]);
-		i++;
-	}
-  }
-  if (program.extra.size() > 0) {
-	program.copyclauses.push_back(cl);
-	cl->finishClause();
-	program.size_of_copy+=1;
-  }
+// 		cl->addPbody(i, program.extra[(itrmm)->id]);
+// 		i++;
+// 	}
+//   }
+//   if (program.extra.size() > 0) {
+// 	program.copyclauses.push_back(cl);
+// 	cl->finishClause();
+// 	program.size_of_copy+=1;
+//   }
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
   switch(param.sys){
 	case ZCHAFF:{
