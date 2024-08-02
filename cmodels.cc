@@ -435,10 +435,12 @@ Cmodels::preprocessing(bool& emptyprogram)
 	emptyprogram=true;
 	return SAT;
   }
+  int nLoopAtoms = 0;
   program.number_of_atoms_in_completion = program.atoms.size();
   for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
     Atom* itrmm = program.atoms[indA];
 	if((itrmm)->inLoop!=-1){
+		nLoopAtoms += 1;
 		// creating two set of copy variables
 		program.copy_set1[(itrmm)->id] = api->new_atom();
 		// cout << "Atom " << (itrmm)->id << " copy atom: " << program.copy_set1[(itrmm)->id]->id << endl;
@@ -466,6 +468,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 		// cl2->print();
 	}
   }
+  cout << "The number of loop atoms: " << nLoopAtoms << endl;
   bool involved = false;
   for(long indA=0; indA<program.number_of_atoms_in_completion; indA++){
 	Atom *curAtom=program.atoms[indA];
@@ -586,6 +589,22 @@ Cmodels::preprocessing(bool& emptyprogram)
   if (program.extra.size() > 0) {
 	program.copyclauses.push_back(cl);
 	cl->finishClause();
+	program.size_of_copy+=1;
+  }
+  if (nLoopAtoms == 0) {
+	// tight program
+	Clause* cl1 = new Clause();
+	cl1->allocateClause(1,0);
+	cl1->addNbody(0, program.atoms[0]);
+	cl1->finishClause();
+	program.copyclauses.push_back(cl1);
+	program.size_of_copy+=1;
+
+	Clause* cl2 = new Clause();
+	cl2->allocateClause(0,1);
+	cl2->addPbody(0, program.atoms[0]);
+	cl2->finishClause();
+	program.copyclauses.push_back(cl2);
 	program.size_of_copy+=1;
   }
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
