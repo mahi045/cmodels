@@ -528,8 +528,8 @@ Output::print_timings(){
 void
 Output::print(){  
 
-  if(asparagus==STANDARD &&!program->tight)
-  	cout<<"Number of loops "<<numLoops<<endl;
+//   if(asparagus==STANDARD &&!program->tight)
+//   	cout<<"Number of loops "<<numLoops<<endl;
 
   PrintStats();
   print_timings();

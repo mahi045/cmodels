@@ -731,7 +731,7 @@ Cmodels::cmodels()
 	}
   }
   if(param.sys==DIMACS_PRODUCE||param.sys==CASP_DIMACS_PRODUCE){
-    cerr<<param.completionFileName<< " file is produced"<<endl;
+    // cerr<<param.completionFileName<< " file is produced"<<endl;
     return;
   }
   

@@ -273,7 +273,7 @@ int main (int argc, char *argv[])
       return 1;
     }
   if(ctable.cmodels.output.asparagus==STANDARD)
-    cerr << "cmodels version "<<CMODELS_VERSION<<" Reading...";
+    // cerr << "cmodels version "<<CMODELS_VERSION<<" Reading...";
 
   ctable.cmodels.output.timerAll.start();
 
