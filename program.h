@@ -78,6 +78,7 @@ public:
   long number_of_clauses;
   long size_of_copy;
   long size_of_copy_operation;
+  long len_of_copy_operation;
   long number_of_nestedRules;
   long cmodelsAtomsFromThisId;
 

@@ -496,7 +496,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 			for (Atom **a = cr->head; a != cr->hend; a++) pbody++;
 			for (Atom **a = cr->pbody; a != cr->nnend; a++) nbody++;
 			for (Atom **a = cr->nbody; a != cr->nend; a++) pbody++;
-			size_of_copy_operation += (nbody + pbody);
+			program.size_of_copy_operation += (nbody + pbody);
 			cl->allocateClause(nbody, pbody);
 			cl2->allocateClause(nbody, pbody);
 			for (Atom **a = cr->head; a != cr->hend; a++){
@@ -534,6 +534,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 			program.copyclauses.push_back(cl);
 			cl->finishClause();
 			// cl->print();
+			program.len_of_copy_operation += 1
 			program.size_of_copy+=1;
 
 			program.copyclauses.push_back(cl2);
@@ -609,6 +610,7 @@ Cmodels::preprocessing(bool& emptyprogram)
 	program.size_of_copy+=1;
   }
   cout << "The number of literals in copy operation: " << program.size_of_copy_operation << endl;
+  cout << "The length in copy operation: " << program.len_of_copy_operation << endl;
   //we allocate the managers for Zchaff/Minisat/Minisat1 here
   switch(param.sys){
 	case ZCHAFF:{
